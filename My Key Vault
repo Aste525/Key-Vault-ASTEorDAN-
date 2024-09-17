@@ -1,0 +1,96 @@
+import hashlib
+import secrets
+import json
+from datetime import datetime
+
+class ProductKeyVault:
+    def __init__(self, btc_address, magic_number, min_payment):
+        self.BTC_ADDRESS = btc_address
+        self.MAGIC_NUMBER = magic_number
+        self.MIN_PAYMENT = min_payment
+        self.KEYWORD = "ASTEorDAN"
+        self.purchases = {}
+
+    def generate_key(self, input_data):
+        combined = f"{input_data}{self.MAGIC_NUMBER}{self.KEYWORD}".encode()
+        sha256 = hashlib.sha256(combined).hexdigest()
+        sha3_384 = hashlib.sha3_384(combined).hexdigest()
+        blake2s = hashlib.blake2s(combined).hexdigest()
+        key_parts = [
+            sha256[:8],
+            sha3_384[:8],
+            blake2s[:8],
+            self.KEYWORD
+        ]
+        return "-".join(key_parts)
+
+    def verify_payment(self, amount):
+        return amount > self.MIN_PAYMENT
+
+    def process_purchase(self, user_input, payment_amount):
+        if self.verify_payment(payment_amount):
+            product_key = self.generate_key(user_input)
+            purchase_time = datetime.now().isoformat()
+            self.purchases[product_key] = {
+                "user_input": user_input,
+                "payment_amount": payment_amount,
+                "purchase_time": purchase_time
+            }
+            return product_key
+        else:
+            return None
+
+    def verify_access(self, product_key):
+        return product_key in self.purchases
+
+    def get_purchase_info(self, product_key):
+        return self.purchases.get(product_key)
+
+    def save_purchases(self, filename):
+        with open(filename, 'w') as f:
+            json.dump(self.purchases, f)
+
+    def load_purchases(self, filename):
+        try:
+            with open(filename, 'r') as f:
+                self.purchases = json.load(f)
+        except FileNotFoundError:
+            print("File not found. Creating new database.")
+
+def main():
+    vault = ProductKeyVault("1LVW6zyMk88KDBn9qLAkPuTtFbDeErmpdp", 941, 0.001)
+    vault.load_purchases("purchases.json")
+
+    while True:
+        print("\n1. Purchase Product")
+        print("2. Access Product")
+        print("3. Exit")
+        choice = input("Select option (1/2/3): ")
+
+        if choice == '1':
+            user_input = input("Enter your product data: ")
+            payment_amount = float(input("Enter payment amount in BTC: "))
+            product_key = vault.process_purchase(user_input, payment_amount)
+            if product_key:
+                print(f"Payment received. Your Product Key: {product_key}")
+                vault.save_purchases("purchases.json")
+            else:
+                print("Insufficient payment.")
+
+        elif choice == '2':
+            product_key = input("Enter your Product Key: ")
+            if vault.verify_access(product_key):
+                info = vault.get_purchase_info(product_key)
+                print(f"Access granted. Purchase info: {info}")
+            else:
+                print("Invalid or not found Product Key.")
+
+        elif choice == '3':
+            print("Thank you for using our service.")
+            break
+
+        else:
+            print("Invalid choice. Please try again.")
+
+if __name__ == "__main__":
+    main()
