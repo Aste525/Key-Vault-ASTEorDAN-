@@ -8,7 +8,7 @@ class ProductKeyVault:
         self.BTC_ADDRESS = btc_address
         self.MAGIC_NUMBER = magic_number
         self.MIN_PAYMENT = min_payment
-        self.KEYWORD = "ASTEorDAN"
+        self.KEYWORD = "Mionic"
         self.purchases = {}
 
     def generate_key(self, input_data):
@@ -58,7 +58,7 @@ class ProductKeyVault:
             print("File not found. Creating new database.")
 
 def main():
-    vault = ProductKeyVault("1LVW6zyMk88KDBn9qLAkPuTtFbDeErmpdp", 941, 0.001)
+    vault = ProductKeyVault("1LVW6zyMk88KDBn9qLAkPuTtFbDeErmpdp", 941, 0.005)
     vault.load_purchases("purchases.json")
 
     while True:
