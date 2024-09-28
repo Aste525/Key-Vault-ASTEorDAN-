@@ -6,7 +6,7 @@ class AST399:
     def __init__(self, bet_factor, kelly_criterion):
         self.BET_FACTOR = bet_factor
         self.KELLY_CRITERION = kelly_criterion
-        self.X_FACTOR = secrets.randbelow(1000) / 1000
+        self.X_FACTOR = secrets.randbelow(1001) / 1001
 
     def generate_key(self):
         return secrets.token_bytes(399)
