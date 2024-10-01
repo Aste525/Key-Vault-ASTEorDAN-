@@ -6,7 +6,7 @@ class AST399:
     def __init__(self, bet_factor, kelly_criterion):
         self.BET_FACTOR = bet_factor
         self.KELLY_CRITERION = kelly_criterion
-        self.X_FACTOR = secrets.randbelow(1001) / 1001
+        self.X_FACTOR = secrets.randbelow(1001) / 1000
 
     def generate_key(self):
         return secrets.token_bytes(399)
@@ -85,7 +85,7 @@ class ProductKeyVault:
 
 def main():
     btc_address = "1LVW6zyMk88KDBn9qLAkPuTtFbDeErmpdp"
-    min_payment = 0.005
+    min_payment = 0.05
     
     vault = ProductKeyVault(btc_address, min_payment)
     vault.load_purchases("purchases.json")
